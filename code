@@ -1,0 +1,52 @@
+#include <Servo.h>
+
+#define trigPin 6
+#define echoPin 5
+#define servoPin 3
+
+Servo gateServo;
+
+const int bukaSudut = 90;  // Sudut terbuka
+const int tutupSudut = 5;  // Sudut tertutup
+const int jarakAmbang = 10;  // cm
+const int waktuTunggu = 2000; // waktu palang tetap terbuka (ms)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  gateServo.attach(servoPin);
+  gateServo.write(tutupSudut); // posisi awal tertutup
+}
+
+void loop() {
+  long durasi;
+  int jarak;
+
+  // Kirim pulsa ke sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Hitung durasi dan konversi ke cm
+  durasi = pulseIn(echoPin, HIGH);
+  jarak = durasi * 0.034 / 2;
+
+  Serial.print("Jarak: ");
+  Serial.print(jarak);
+  Serial.println(" cm");
+
+  if (jarak > 0 && jarak < jarakAmbang) {
+    // Kendaraan terdeteksi, buka palang
+    gateServo.write(bukaSudut);
+    digitalWrite(9, HIGH);
+    delay(waktuTunggu); // tunggu beberapa detik
+    gateServo.write(tutupSudut); // tutup kembali
+  }
+  else{
+    digitalWrite(9, LOW);
+  }
+  delay(500); // jeda pembacaan
+}
