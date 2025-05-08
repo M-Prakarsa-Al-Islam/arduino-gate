@@ -1,5 +1,4 @@
 #include <Servo.h>
-
 #define trigPin 6
 #define echoPin 5
 #define servoPin 3
